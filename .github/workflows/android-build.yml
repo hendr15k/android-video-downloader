@@ -1,4 +1,4 @@
-name: Android CI - Build APK
+name: Android CI - Build & Release APK
 
 on:
   push:
@@ -13,7 +13,9 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    outputs:
+      version_name: ${{ steps.version.outputs.version }}
+    
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -33,7 +35,14 @@ jobs:
 
     - name: Build Release APK (unsigned)
       run: ./gradlew assembleRelease
-      continue-on-error: true  # Release might fail without signing config
+      continue-on-error: true
+
+    - name: Get version name
+      id: version
+      run: |
+        VERSION=$(date +'%Y.%m.%d-%H%M')
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Version: $VERSION"
 
     - name: Upload Debug APK
       uses: actions/upload-artifact@v4
@@ -60,3 +69,60 @@ jobs:
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "### APK Files" >> $GITHUB_STEP_SUMMARY
         find app/build/outputs/apk -name "*.apk" -exec ls -lh {} \; >> $GITHUB_STEP_SUMMARY || echo "No APK files found" >> $GITHUB_STEP_SUMMARY
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download Debug APK
+      uses: actions/download-artifact@v4
+      with:
+        name: app-debug
+        path: apk/
+
+    - name: Download Release APK
+      uses: actions/download-artifact@v4
+      with:
+        name: app-release-unsigned
+        path: apk/
+      continue-on-error: true
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: v${{ needs.build.outputs.version_name }}
+        name: Android Video Downloader v${{ needs.build.outputs.version_name }}
+        body: |
+          ## Android Video Downloader
+          
+          **Build:** ${{ github.sha }}
+          **Date:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+          
+          ### Download
+          - `app-debug.apk` - Debug build for testing
+          - `app-release-unsigned.apk` - Release build (unsigned)
+          
+          ### Installation
+          1. Download the APK
+          2. Enable "Install from unknown sources" on your device
+          3. Open the APK to install
+        files: apk/*.apk
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Release Summary
+      run: |
+        echo "## Release Created! 🎉" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Version:** v${{ needs.build.outputs.version_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### APK Downloads" >> $GITHUB_STEP_SUMMARY
+        echo "- [app-debug.apk](https://github.com/${{ github.repository }}/releases/tag/v${{ needs.build.outputs.version_name }})" >> $GITHUB_STEP_SUMMARY
+        ls -lh apk/ >> $GITHUB_STEP_SUMMARY
