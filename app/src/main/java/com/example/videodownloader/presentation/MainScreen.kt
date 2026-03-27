@@ -3,6 +3,7 @@ package com.example.videodownloader.presentation
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -86,12 +87,25 @@ fun MainScreen(
             Text("Downloads", style = MaterialTheme.typography.titleLarge)
             Spacer(modifier = Modifier.height(8.dp))
 
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(downloads) { download ->
-                    DownloadItem(download)
+            if (downloads.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "No downloads yet.",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(downloads) { download ->
+                        DownloadItem(download)
+                    }
                 }
             }
         }
@@ -244,10 +258,16 @@ fun DownloadItem(task: DownloadTask) {
             }
             if (task.status == DownloadStatus.DOWNLOADING || task.status == DownloadStatus.PENDING) {
                 Spacer(modifier = Modifier.height(8.dp))
-                LinearProgressIndicator(
-                    progress = if (task.progress > 0) task.progress / 100f else 0f,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                if (task.status == DownloadStatus.PENDING) {
+                    LinearProgressIndicator(
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                } else {
+                    LinearProgressIndicator(
+                        progress = if (task.progress > 0) task.progress / 100f else 0f,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
         }
     }
