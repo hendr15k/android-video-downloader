@@ -18,10 +18,10 @@ class VideoExtractor {
 
         client.newCall(request).execute().use { response ->
             if (!response.isSuccessful) {
-                throw Exception("Failed to fetch URL: ${response.code}")
+                throw Exception("Could not access the website. Please check your internet connection and the URL.")
             }
 
-            val html = response.body?.string() ?: throw Exception("Empty response body")
+            val html = response.body?.string() ?: throw Exception("The website returned an empty response.")
 
             // Try to extract video info from HTML meta tags
             val titleRegex = "<title>(.*?)</title>".toRegex(RegexOption.IGNORE_CASE)
@@ -98,7 +98,7 @@ class VideoExtractor {
             }
 
             // If no video found, throw an exception
-            throw Exception("Could not extract video URL from $url")
+            throw Exception("No supported video found on this page. Try opening the page in a browser to see if the video is accessible.")
         }
     }
 }

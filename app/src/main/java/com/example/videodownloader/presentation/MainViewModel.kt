@@ -45,18 +45,26 @@ class MainViewModel @Inject constructor(
     }
 
     fun extractVideo() {
-        val currentUrl = _url.value
+        val currentUrl = _url.value.trim()
         if (currentUrl.isBlank()) {
-            _error.value = "URL cannot be empty"
+            _error.value = "Please enter a valid video URL"
             return
         }
+
+        try {
+            java.net.URL(currentUrl)
+        } catch (e: Exception) {
+            _error.value = "Invalid URL format. Please enter a valid web address starting with http:// or https://"
+            return
+        }
+
         viewModelScope.launch {
             _isExtracting.value = true
             _error.value = null
             try {
                 _videoInfo.value = extractVideoUseCase(currentUrl)
             } catch (e: Exception) {
-                _error.value = "Failed to extract video: ${e.message}"
+                _error.value = e.message ?: "An unexpected error occurred while extracting the video."
             } finally {
                 _isExtracting.value = false
             }
