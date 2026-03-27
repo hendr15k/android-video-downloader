@@ -12,6 +12,11 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
+import com.example.videodownloader.data.repository.PreferencesRepositoryImpl
+import com.example.videodownloader.domain.repository.PreferencesRepository
+import com.example.videodownloader.data.repository.dataStore
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -44,6 +49,18 @@ object AppModule {
     @Singleton
     fun provideWorkManager(@ApplicationContext context: Context): WorkManager {
         return WorkManager.getInstance(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
+        return context.dataStore
+    }
+
+    @Provides
+    @Singleton
+    fun providePreferencesRepository(dataStore: DataStore<Preferences>, @ApplicationContext context: Context): PreferencesRepository {
+        return PreferencesRepositoryImpl(dataStore, context)
     }
 
     @Provides
