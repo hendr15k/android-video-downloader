@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowDownward
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
@@ -210,7 +211,7 @@ fun QualitySelectionSheet(
                     ) {
                         Text("${quality.resolution} (${quality.format})")
                         Icon(
-                            imageVector = Icons.Default.Clear, // Just a placeholder, ideally a download icon
+                            imageVector = Icons.AutoMirrored.Filled.ArrowDownward,
                             contentDescription = "Download"
                         )
                     }
