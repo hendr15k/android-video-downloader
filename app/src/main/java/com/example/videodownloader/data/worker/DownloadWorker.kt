@@ -63,7 +63,8 @@ class DownloadWorker @AssistedInject constructor(
                 connection.connect()
                 val fileLength = connection.contentLength
 
-                val file = File(context.getExternalFilesDir(null), "${task.title}_${task.quality}.mp4")
+                val fileName = "${sanitizeFileName(task.title)}_${task.quality}.mp4"
+                val file = File(context.getExternalFilesDir(null), fileName)
                 val input = connection.getInputStream()
                 val output = FileOutputStream(file)
 
@@ -129,5 +130,10 @@ class DownloadWorker @AssistedInject constructor(
             }
             notificationManager.createNotificationChannel(channel)
         }
+    }
+
+    private fun sanitizeFileName(name: String): String {
+        return name.replace(Regex("[^a-zA-Z0-9._-]"), "_")
+            .take(80)
     }
 }

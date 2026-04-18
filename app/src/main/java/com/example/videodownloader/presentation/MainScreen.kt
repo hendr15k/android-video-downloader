@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -210,7 +211,7 @@ fun QualitySelectionSheet(
                     ) {
                         Text("${quality.resolution} (${quality.format})")
                         Icon(
-                            imageVector = Icons.Default.Clear, // Just a placeholder, ideally a download icon
+                            imageVector = Icons.Default.Download,
                             contentDescription = "Download"
                         )
                     }
