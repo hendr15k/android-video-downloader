@@ -51,11 +51,13 @@ data/             → Implementierungen
 - **Background Tasks:** WorkManager mit Foreground Notifications
 - **Min SDK:** 24 (Android 7.0) / **Target SDK:** 34 (Android 14)
 
-## Bauen
+## Build
 
 ```bash
 ./gradlew assembleDebug
 ```
+
+Build status: [![Build](https://github.com/hendr15k/android-video-downloader/actions/workflows/build.yml/badge.svg)](https://github.com/hendr15k/android-video-downloader/actions/workflows/build.yml)
 
 ## Lizenz
 
